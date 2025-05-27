@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Auth } from './entities/auth.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    console.log('createAuthDto', createAuthDto);
-    return 'This action adds a new auth';
+  constructor(
+    @InjectRepository(Auth) private authRepository: Repository<Auth>
+  ) { }
+
+  async create(createAuthDto: CreateAuthDto): Promise<Auth> {
+    const auth = new Auth();
+    auth.email = createAuthDto.email;
+    auth.password = createAuthDto.password;
+    return await this.authRepository.save(auth);
   }
 
   findAll() {
