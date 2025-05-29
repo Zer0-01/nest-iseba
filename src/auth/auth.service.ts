@@ -13,6 +13,7 @@ export class AuthService {
 
   async create(createAuthDto: CreateAuthDto): Promise<Auth> {
     const auth = new Auth();
+    auth.name = createAuthDto.name;
     auth.email = createAuthDto.email;
     auth.password = createAuthDto.password;
     return await this.authRepository.save(auth);
