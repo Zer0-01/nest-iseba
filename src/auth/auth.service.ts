@@ -6,7 +6,9 @@ import { Auth } from './entities/auth.entity';
 import { Repository } from 'typeorm';
 import { RegisterDto } from './dto/register.dto';
 import { JwtService } from '@nestjs/jwt';
-import { hash } from 'bcrypt';
+import { hash, compare } from 'bcrypt';
+import { LoginDto } from './dto/login.dto';
+import { jwt_config } from 'src/config/jwt';
 
 @Injectable()
 export class AuthService {
@@ -65,6 +67,55 @@ export class AuthService {
       statusCode: HttpStatus.OK,
       message: 'User created successfully',
     }
+  }
 
+  async login(data: LoginDto) {
+    const checkUserExist = await this.authRepository.findOne({
+      where: {
+        email: data.email
+      }
+    });
+
+    if (!checkUserExist) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    const checkPassword = await compare(
+      data.password,
+      checkUserExist.password,
+    );
+
+
+
+
+    if (checkPassword) {
+      const accessToken = this.generateJwt({
+        sub: checkUserExist.id,
+        name: checkUserExist.name,
+        email: checkUserExist.email,
+      });
+
+      return {
+        statusCode: 200,
+        message: 'Login berhasil',
+        accessToken: accessToken,
+      };
+    } else {
+      throw new HttpException(
+        'User or password not match',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+  }
+
+  generateJwt(payload: any) {
+    return this.jwtService.sign(
+      payload, {
+      secret: jwt_config.secret,
+      expiresIn: jwt_config.expired,
+
+    }
+    );
   }
 }
