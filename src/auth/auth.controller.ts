@@ -6,12 +6,15 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -30,6 +33,12 @@ export class AuthController {
   @Post('login')
   async login(@Body() data: LoginDto) {
     return this.authService.login(data);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('profile')
+  async profile(@Req() req) {
+    return await this.authService.profile(req.id);
   }
 
   @Get()

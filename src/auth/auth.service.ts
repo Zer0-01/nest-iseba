@@ -109,6 +109,18 @@ export class AuthService {
 
   }
 
+  async profile(userId : number) {
+    return await this.authRepository.findOne({
+      where: {
+        id: userId
+      },
+      select: {
+        name: true,
+        email: true,
+      }
+    });
+  }
+
   generateJwt(payload: any) {
     return this.jwtService.sign(
       payload, {
