@@ -96,7 +96,7 @@ export class AuthService {
       });
 
       return {
-        statusCode: 200,
+        statusCode: HttpStatus.OK,
         message: 'Login berhasil',
         accessToken: accessToken,
       };
